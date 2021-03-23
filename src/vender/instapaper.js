@@ -116,8 +116,9 @@ Instapaper = (function() {
         data: options.data
       }));
       auth = this.authTemplate(options.req);
+      let url =  options.url.startsWith('https') || options.url.startsWith('http') ? options.url : `${this.baseUrl}${options.url}`
       settings = {
-        url: `${this.baseUrl}${options.url}`,
+        url: url,
         dataType: (function() {
           return options.dataType || "json";
         })(),

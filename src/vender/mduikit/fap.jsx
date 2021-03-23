@@ -291,17 +291,18 @@ class Panel extends React.Component {
         const style = { ...this.style };
 
         style.panel_border.borderBottom = style.panel_border.borderBottom + ( this.props.activeColor ? this.props.activeColor : style.activeColor );
-
         const active_border = { ...style.panel_border, ...style.panel_border_active },
               active_group  = { ...style.group, ...style.group_active },
               events        = this.props.tabAutoSel ? { onMouseEnter: evt => this.onTabChange(evt) } : { onClick: evt => this.onTabChange(evt) },
-              tabs          = this.props.items.map( ( item, idx ) => {
+              tabs          =  this.props.items.map( ( item, idx ) => {
                 return <panel-tab style={ style.panel_tab } active={ idx == 0 ? "true" : "false" } idx={ idx } { ...events } >
                         <span style={ style.panel_tab_label }>{item}</span>
                         <panel-border style={ idx == 0 ? active_border : { ...style.panel_border } }></panel-border>
                     </panel-tab>;
              }),
-             groups         = this.props.children.map( ( child, idx ) => {
+             groups         = !Array.isArray(this.props.children)? [
+                 <panel-group style={ active_group } active={  "true"  } idx={ 0 }>{this.props.children}</panel-group>
+             ] : this.props.children.map( ( child, idx ) => {
                 return <panel-group style={ idx == 0 ? active_group : { ...style.group } } active={ idx == 0 ? "true" : "false" } idx={ idx }>{child}</panel-group>;
              });
 

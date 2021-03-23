@@ -234,6 +234,13 @@ const readItems = {
         "name" : "关闭",
         "icon" : ss.IconPath("exit_icon"),
     },
+    "customBtn": {
+        "name": "转发",
+        "icon" : ss.IconPath("option_icon"),
+        "color": "#03A9F4",
+        "items": {
+        }
+    },
     "option" : {
         "name" : "设定",
         "icon" : ss.IconPath("option_icon"),

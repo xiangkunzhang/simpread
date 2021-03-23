@@ -1,3 +1,5 @@
+import Notify from "../vender/notify/notify";
+
 console.log( "=== simpread read controlbar load ===" )
 
 import * as ss     from 'stylesheet';
@@ -19,6 +21,7 @@ import Sitebar     from 'sitebar';
 import Fab         from 'fab';
 import Fap         from 'fap'
 import * as ttips  from 'tooltip';
+import {makeCustomBtn} from "../service/customBtn";
 
 let notify, readItems;
 const tooltip_options = {
@@ -29,7 +32,7 @@ const tooltip_options = {
 
 /**
  * Read controlbar
- * 
+ *
  * @class
  */
 export default class ReadCtlbar extends React.Component {
@@ -68,7 +71,7 @@ export default class ReadCtlbar extends React.Component {
         run.Event( "export", type );
 
         const action = ( event, type ) => {
-            this.props.multi && 
+            this.props.multi &&
             [ "markdown", "dropbox", "yinxiang","evernote", "onenote", "gdrive" ].includes( type ) &&
             new Notify().Render( "当前为论坛类页面，不建议使用导出服务，有可能出现未知错误。" );
 
@@ -107,8 +110,12 @@ export default class ReadCtlbar extends React.Component {
                         const [ title, desc, content ] = [ $( "sr-rd-title" ).text().trim(), $( "sr-rd-desc" ).text().trim(), $( "sr-rd-content" ).html().trim() ];
                         output.Action( type, title, desc, content );
                     break;
+                case type.startsWith( 'custom_btn'):
+                        const [ title1, desc1, content1 ] = [ $( "sr-rd-title" ).text().trim(), $( "sr-rd-desc" ).text().trim(), $( "sr-rd-content" ).html().trim() ];
+                        output.Action( type, title1, desc1, content1 );
+                    break;
                 default:
-                    if ( type.indexOf( "_" ) > 0 && type.startsWith( "share" ) || 
+                    if ( type.indexOf( "_" ) > 0 && type.startsWith( "share" ) ||
                         [ "fullscreen", "save", "markdown", "offlinemarkdown", "png", "epub", "pdf", "kindle", "temp", "bear", "ulysses", "html", "offlinehtml", "snapshot", "dropbox", "pocket", "instapaper", "linnk", "yinxiang", "evernote", "onenote", "gdrive", "jianguo", "yuque", "notion", "youdao", "weizhi" ].includes( type )) {
                         const [ title, desc, content ] = [ $( "sr-rd-title" ).text().trim(), $( "sr-rd-desc" ).text().trim(), $( "sr-rd-content" ).html().trim() ];
                         output.Action( type, title, desc, content );
@@ -126,6 +133,7 @@ export default class ReadCtlbar extends React.Component {
     }
 
     onChange( type, custom ) {
+        console.log(type)
         const [ key, value ] = [ type.split( "_" )[0], type.split( "_" )[1] ];
         run.Event( "read_ui", { key, value, custom });
         this.props.onAction && this.props.onAction( key, value, custom );
@@ -137,7 +145,7 @@ export default class ReadCtlbar extends React.Component {
     }
 
     componentWillMount() {
-        readItems = $.extend( true, {}, conf.readItems );
+        readItems = $.extend( true, { }, conf.readItems );
         try {
             if ( storage.current.fap ) {
                 delete readItems.exit;
@@ -173,6 +181,43 @@ export default class ReadCtlbar extends React.Component {
                     };
                 });
             })
+            makeCustomBtn((result)=>{
+                console.log(result)
+                if (result && Object.keys(result).length>0){
+                    readItems.customBtn.items = result
+                }else {
+                    delete readItems.customBtn;
+
+                    readItems.customBtn.items =  {
+                            "forward_yule":{
+                                "name": "娱乐分享",
+                                // "icon" : ss.IconPath("share_gplus_icon"),
+                                "fontIcon": "娱",
+                                "color": "#DD4B39",
+                            },
+                            "forward_it":{
+                                "name": "IT分享",
+                                // "icon" : ss.IconPath("share_gplus_icon"),
+                                "fontIcon": "IT",
+                                "color": "#8bdd39",
+                            },
+                            "forward_ddd":{
+                                "name": "DDD分享",
+                                // "icon" : ss.IconPath("share_gplus_icon"),
+                                "fontIcon": "DDD",
+                                "color": "#8bdd39",
+                            },
+                        }
+                }
+            })
+            // 增加自定义
+            // storage.Safe(()=>{
+            //     notify && notify.complete();
+            //     storage.secret.custom = [{abc:'asdsa.com'}]
+            //     this.setState({ secret: storage.secret });
+            //     new Notify().Render( 2, `设置远程保存成功。` );
+            // })
+            // readItems.custombtn = {}
             // Add test source
             storage.current.fap && storage.Plugins( () => {
                 !$.isEmptyObject( storage.plugins ) && storage.option.plugins.forEach( id => {
@@ -203,15 +248,12 @@ export default class ReadCtlbar extends React.Component {
     }
 
     render() {
-        const Controlbar = storage.current.fap ? 
-            <Fap items={ [ "样式", "动作", "站点", "插件" ] } autoHide={ false }
-                waves="md-waves-effect md-waves-circle md-waves-float" 
+        const Controlbar = storage.current.fap ?
+            <Fap items={ [ "动作" ] } autoHide={ false }
+                waves="md-waves-effect md-waves-circle md-waves-float"
                 onOpen={ ()=> this.onPop( "open" ) } onClose={ ()=> this.onPop( "close" ) }
                 onAction={ (event, type)=>this.onAction(event, type ) }>
-                <ReadOpt option={ storage.current } onChange={ (t,c)=>this.onChange(t,c)}/>
                 <Actionbar items={ readItems } onAction={ (type)=>this.onAction(undefined, type ) }/>
-                <Sitebar />
-                <Pluginbar />
             </Fap>
             :
             <Fab items={ readItems } tooltip={ tooltip_options } waves="md-waves-effect md-waves-circle md-waves-float" onAction={ (event, type)=>this.onAction(event, type ) } />

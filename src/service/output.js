@@ -14,15 +14,15 @@ import * as snap    from 'snapshot';
 
 /**
  * Controlbar common action, include:
- * 
+ *
  * - share_xxx
  * - save, markdown, png, pdf
  * - dropbox, pocket, linnk, evernote, onenote, gdrive
- * 
- * @param {string} type, include above ↑ type 
- * @param {string} current page: title 
- * @param {string} current page: desc 
- * @param {string} current page: content 
+ *
+ * @param {string} type, include above ↑ type
+ * @param {string} current page: title
+ * @param {string} current page: desc
+ * @param {string} current page: content
  */
 function action( type, title, desc, content ) {
 
@@ -410,6 +410,96 @@ function action( type, title, desc, content ) {
                 }
             });
         })
+    } else if (type.startsWith('custom_btn')) {
+        const id      = type.replace( "custom_btn_", "" ),convert = ( type, callback ) => {
+                if ( type == "html" ) {
+                    styles( csses => {
+                        const html = offline.HTML( title, desc, content, csses );
+                        callback( html );
+                    });
+                } else if ( type == "ofhtml" ) {
+                    const notify2 = new Notify().Render({ content: "图片转换中吗，请稍等...", state: "loading" });
+                    offline.getImages( () => {
+                        notify2.complete();
+                        new Notify().Render( 0, "全部图片已经转换完毕，开始发送，请稍等。" );
+                        styles( csses => {
+                            const html = offline.HTML( title, desc, $( "sr-rd-content" ).html(), csses );
+                            offline.restoreImg();
+                            callback( html );
+                        });
+                    });
+                } else if (type == 'ofmd') {
+                    toMarkdown( result => {
+                        offline.Markdown( result, str => {
+                            callback(str)
+                        });
+                    });
+                } else {
+                    toMarkdown( markdown => {
+                        callback( markdown );
+                    });
+                }
+            };
+        // item = JSON.parse( item );
+        // item.format == undefined && ( item.format = "md" );
+        storage.Safe( () => {
+            // console.log(storage.secret.custom.findIndex(0))
+
+            let callbackUrl=storage.secret.custom_option.callback_url
+            if (!callbackUrl){
+                new Notify().Render( 2, `未配置回调URL无法保存` );
+            } else {
+                storage.secret.custom_btn_list.items.forEach(item=>{
+                    if (item.name === id){
+                        convert( 'md', str => {
+                            title        = title.replace( /[|@!#$%^&*()<>/,.+=\\]/ig, "-" );
+                            let cus_title = prompt("文章标题",title)
+                            if (cus_title != null && cus_title !== ''){
+                                let ajaxData = {
+                                    title: cus_title,
+                                    url: location.href,
+                                    content: str,
+                                    type: 'md',
+                                    conv: 's2t',
+                                    tag_name: item.name,
+                                    tag_title: item.title,
+                                    force_update: true
+                                }
+                                console.log(ajaxData)
+                                const option = {
+                                    url :callbackUrl ,
+                                    type: 'POST',
+                                    dataType: "JSON",
+                                    contentType: "",
+                                    async: true,
+                                    cache: false,
+                                    data: ajaxData
+                                }
+                                console.log(option)
+                                new Notify().Render( `开始保存到 ${ item.title }，请稍等...` );
+                                browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.CORB,{setting:option}),result=>{
+                                    console.log(result)
+                                    if (result.done){
+                                        new Notify().Render( 2, `已成功保存到${item.title}` );
+                                    }else {
+                                        new Notify().Render( 2, `保存到${item.title} 失败` );
+                                    }
+                                })
+                                // exp.webdav.Add( 'url', 'item.user', 'item.password', `${cus_title}${suffix}`, str, result => {
+                                //     let error = undefined;
+                                //     if ( result && ( result.status != 201 && result.status != 204 )) {
+                                //         error = `导出到 ${ '娱乐' } 失败，请稍后再试。`;
+                                //     }
+                                //     exp.svcCbWrapper( result, error, '娱乐', type, new Notify() );
+                                // });
+                            } else {
+                                new Notify().Render( 2, `取消转发` );
+                            }
+                        });
+                    }
+                })
+            }
+        })
     }
     else {
         new Notify().Render( 2, "当前模式下，不支持此功能。" );
@@ -418,7 +508,7 @@ function action( type, title, desc, content ) {
 
 /**
  * Open and Remove CORB iframe
- * 
+ *
  * @param {string} include: load & remove
  */
 function corbLoader( state, callback ) {

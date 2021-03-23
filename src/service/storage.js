@@ -7,7 +7,7 @@ import {version,patch}from 'version';
 
 /**
  * Read and Write Chrome storage
- * 
+ *
  * @class
  */
 
@@ -270,7 +270,12 @@ let current  = {},
             password      : "",
             access_token  : "",
         },
-        "webdav"  : []
+        "webdav"  : [],
+        "custom_btn_list" : {},
+        "custom_option": {
+            list_url: "",
+            callback_url: "",
+        }
     };
     //stcode = -1;
 
@@ -278,7 +283,7 @@ class Storage {
 
     /**
      * Get simpread.option data structure
-     * 
+     *
      * @return {object} simpread["option"]
      */
     get option() {
@@ -287,7 +292,7 @@ class Storage {
 
     /**
      * Get simpread.focus data structure
-     * 
+     *
      * @return {object} simpread["focus"]
      */
     get focus() {
@@ -296,7 +301,7 @@ class Storage {
 
     /**
      * Get simpread.read data structure
-     * 
+     *
      * @return {object} simpread["read"]
      */
     get read() {
@@ -305,7 +310,7 @@ class Storage {
 
     /**
      * Get current data structure
-     * 
+     *
      * @return {object} current
      */
     get current() {
@@ -314,7 +319,7 @@ class Storage {
 
     /**
      * Get read site code, include: simpread.sites and simpread.read.sites
-     * 
+     *
      * @return {int} @see Findsite
      */
     /*
@@ -325,7 +330,7 @@ class Storage {
 
     /**
      * Get unread list
-     * 
+     *
      * @return {array} unread list
      */
     get unrdist() {
@@ -334,7 +339,7 @@ class Storage {
 
     /**
      * Get notice
-     * 
+     *
      * @return {object} notice
      */
     get notice() {
@@ -343,7 +348,7 @@ class Storage {
 
     /**
      * Get version
-     * 
+     *
      * @return {string} version
      */
     get version() {
@@ -352,7 +357,7 @@ class Storage {
 
     /**
      * Get patch version
-     * 
+     *
      * @return {string} patch version
      */
     get patch() {
@@ -361,7 +366,7 @@ class Storage {
 
     /**
      * Get simpread data structure clone
-     * 
+     *
      * @return {string} version
      */
     get simpread() {
@@ -370,7 +375,7 @@ class Storage {
 
     /**
      * Get statistics
-     * 
+     *
      * @return {object} statistics object
      */
     get statistics() {
@@ -379,7 +384,7 @@ class Storage {
 
     /**
      * Get user info
-     * 
+     *
      * @return {object} user object
      */
     get user() {
@@ -388,7 +393,7 @@ class Storage {
 
     /**
      * Get secret data structure
-     * 
+     *
      * @return {object} secret object
      */
     get secret() {
@@ -397,7 +402,7 @@ class Storage {
 
     /**
      * Get plugins data structure
-     * 
+     *
      * @return {object} plugins object
      */
     get plugins() {
@@ -406,7 +411,7 @@ class Storage {
 
     /**
      * Get all sites structure
-     * 
+     *
      * @return {object} all sites
      */
     get sites() {
@@ -420,7 +425,7 @@ class Storage {
 
     /**
      * Get simpread.websites data structure
-     * 
+     *
      * @return {object} secret object
      */
     get websites() {
@@ -429,7 +434,7 @@ class Storage {
 
     /**
      * Set puread object
-     * 
+     *
      * @param {object} pure read
      */
     set puread( value ) {
@@ -438,7 +443,7 @@ class Storage {
 
     /**
      * Get puread object
-     * 
+     *
      * @return {object} pure read
      */
     get puread() {
@@ -447,7 +452,7 @@ class Storage {
 
     /**
      * Get service url
-     * 
+     *
      * @return {string} url
      */
     get service() {
@@ -457,7 +462,7 @@ class Storage {
 
     /**
      * Get notice service url
-     * 
+     *
      * @return {string} url
      */
     get notice_service() {
@@ -469,7 +474,7 @@ class Storage {
 
     /**
      * Get help service url
-     * 
+     *
      * @return {string} url
      */
     get help_service() {
@@ -478,7 +483,7 @@ class Storage {
 
     /**
      * Get simpread object from chrome storage
-     * 
+     *
      * @param {function} callback
      */
     Read( callback ) {
@@ -499,8 +504,8 @@ class Storage {
 
     /**
      * Read storage usage aync only firefox
-     * 
-     * @param {func} callback 
+     *
+     * @param {func} callback
      */
     ReadAsync( callback ) {
         const db = browser.storage.local.get();
@@ -531,10 +536,10 @@ class Storage {
 
     /**
      * Write Object only firefox
-     * 
-     * @param {object} simpread object 
-     * @param {object} secret object 
-     * @param {object} plugins object 
+     *
+     * @param {object} simpread object
+     * @param {object} secret object
+     * @param {object} plugins object
      */
     WriteAsync( simp, sec, plugs ) {
         simpread  = simp;
@@ -551,7 +556,7 @@ class Storage {
 
     /**
      * Set simpread object to chrome storage
-     * 
+     *
      * @param {function} callback
      * @param {object}   new simpread data structure
      */
@@ -562,7 +567,7 @@ class Storage {
 
     /**
      * Set simpread sites to chrome storage
-     * 
+     *
      * @param {object} all sites, @see this.sites
      * @param {function} callback
      */
@@ -586,7 +591,7 @@ class Storage {
 
     /**
      * Set current to simpread[key]
-     * 
+     *
      * @param {string} @see mode
      */
     Setcur( key ) {
@@ -596,7 +601,7 @@ class Storage {
 
     /**
      * Verity current changed
-     * 
+     *
      * @param {string} @see mode
      */
     VerifyCur( type ) {
@@ -607,7 +612,7 @@ class Storage {
 
     /**
      * Compare focus and read setting is changed
-     * 
+     *
      * @param  {string} inlcude: focus, read
      * @return {object} option: option changed, st: site changed
      */
@@ -630,7 +635,7 @@ class Storage {
 
     /**
      * Get remote from type
-     * 
+     *
      * @param {string} include: local, remote, origins, versions and <urls>
      * @param {func} callback
      */
@@ -666,7 +671,7 @@ class Storage {
 
     /**
      * Statistics simpread same info
-     * 
+     *
      * @param {string} include: create, focus, read, service
      * @param {string} include: service type, e.g. pdf png onenote
      * @param {boolean} include: read & write
@@ -713,7 +718,7 @@ class Storage {
 
     /**
      * Unread list
-     * 
+     *
      * @param {type} include: add remove
      * @param {any} include: object( @see unread ) or index
      * @param {function} callback
@@ -765,7 +770,7 @@ class Storage {
 
     /**
      * Verify simpread data structure
-     * 
+     *
      * @param  {object} verify simpread data structure, when undefined, verify self
      * @return {object} option: { code: 0|-1|-2, keys: [ "bgcolor", "layout" ] }
      *         code: 0: valid success; -1: field name failed; -2: site field name failed;
@@ -813,7 +818,7 @@ class Storage {
 
     /**
      * Safe set/get, secret not import/export
-     * 
+     *
      * @param {object}   secret
      * @param {function} callback
      */
@@ -848,7 +853,7 @@ class Storage {
 
     /**
      * Notice set/get
-     * 
+     *
      * @param {object}   notice
      * @param {function} callback
      */
@@ -872,7 +877,7 @@ class Storage {
 
     /**
      * Plugins set/get, plugins not import/export
-     * 
+     *
      * @param {object}   plugins
      * @param {function} callback
      */
@@ -894,7 +899,7 @@ class Storage {
 
     /**
      * Export
-     * 
+     *
      * @return {string} object json stringify
      */
     Export() {
@@ -915,7 +920,7 @@ class Storage {
 
     /**
      * Restore simpread[key]
-     * 
+     *
      * @param {string} @see mode
      */
     Restore( key ) {
@@ -925,7 +930,7 @@ class Storage {
 
     /**
      * Clear simpread data structure
-     * 
+     *
      * @param {string}   include: local remote all
      * @param {function} callback
      */
@@ -935,7 +940,7 @@ class Storage {
 
     /**
      * Fix simpread.read.site only old 1.0.0 / 1.0.1 and 1.1.0
-     * 
+     *
      * @param  {array} changed target
      * @param  {string} old version
      * @param  {string} new version
@@ -973,7 +978,7 @@ class Storage {
 
 /**
  * Swap source and target property
- * 
+ *
  * @param {object} source origin
  * @param {object} target origin
  */
@@ -988,7 +993,7 @@ function swap( source, target ) {
 
 /**
  * Deep clone object
- * 
+ *
  * @param  {object} target object
  * @return {object} new target object
  */
@@ -998,7 +1003,7 @@ function clone( target ) {
 
 /**
  * Call chrome storage set
- * 
+ *
  * @param {function} callback
  * @param {object}   when exist no_update = false
  */
@@ -1015,7 +1020,7 @@ function save( callback, no_update ) {
 
 /**
  * Get now time
- * 
+ *
  * @return {string} return now, e.g. 2017年04月03日 11:43:53
  */
 function now() {
@@ -1026,7 +1031,7 @@ function now() {
 
 /**
  * Get URI from puread/util getURI()
- * 
+ *
  * @return {string} e.g. current site url is http://www.cnbeta.com/articles/1234.html return http://www.cnbeta.com/articles/
  */
 function getURI() {

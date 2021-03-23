@@ -3,7 +3,7 @@ console.log( "===== simpread option labs:Authorize load =====" )
 import {storage} from 'storage';
 import * as exp  from 'export';
 import * as msg  from 'message';
-import {browser} from 'browser';
+import {br, browser} from 'browser';
 import * as permission
                  from 'permission';
 
@@ -323,6 +323,32 @@ export default class Auth extends React.Component {
         storage.Safe( () => this.setState({ secret: storage.secret }), storage.secret );
     }
 
+    customBtnOnChange(value,model) {
+        switch (true) {
+            case model === "custom_btn_list":
+                this.state.secret.custom_btn_list = JSON.parse(event.target.value);
+                storage.secret.custom_btn_list = this.state.secret.custom_btn_list
+                break
+            case model === "custom_list_api":
+                if (this.state.secret.custom_option){
+                    this.state.secret.custom_option.list_url = event.target.value
+                } else {
+                    this.state.secret.custom_option = { list_url:event.target.value, callback_url: ''}
+                }
+                storage.secret.custom_option = this.state.secret.custom_option
+                break
+            case model === "custom_callback_api":
+                if (this.state.secret.custom_option){
+                    this.state.secret.custom_option.callback_url = event.target.value
+                } else {
+                    this.state.secret.custom_option = { callback_url:event.target.value, list_url: ''}
+                }
+                storage.secret.custom_option = this.state.secret.custom_option
+                break
+        }
+        storage.Safe( () => this.setState({ secret: storage.secret }), storage.secret );
+    }
+
     notionChange() {
         const notify = new Notify().Render({ state: "loading", content: `正在获取 Notion Page ，请稍等` });
         exp.notion.Auth( ( result, error, warn ) => {
@@ -612,7 +638,24 @@ export default class Auth extends React.Component {
                             waves="md-waves-effect md-waves-button"
                             onClick={ (s)=>this.webdavAuth() } />
                         </div>
-
+                        <div className="version-tips" data-version="1.1.3" data-hits="suctombtn">
+                            <div className="label" data-head-level="h1">自定义按钮</div>
+                            <TextField
+                                placeholder="请填入 按钮列表 API地址。"
+                                value={ (this.state.secret.custom_option || {} ).list_url }
+                                onChange={ (evt)=>this.customBtnOnChange(  evt.target.value,'custom_list_api' ) }
+                            />
+                            <TextField
+                                placeholder="请填入 文章回调 API地址。"
+                                value={ (this.state.secret.custom_option || {} ).callback_url }
+                                onChange={ (evt)=>this.customBtnOnChange( evt.target.value,'custom_callback_api' ) }
+                            />
+                            <TextField multi={true} rows={8}
+                                       placeholder={`自定义按钮列表，{items:[{"name": "it.microservice","title": "微服务","sort": 160,"created_at": "1616432165277","updated_at": "1616432165277","is_deleted": false}]}`}
+                                       value={ JSON.stringify(this.state.secret.custom_btn_list||{})}
+                                       onChange={ (evt)=>this.customBtnOnChange(  evt.target.value,'custom_btn_list' ) }
+                            />
+                        </div>
                     </div>;
         }
 

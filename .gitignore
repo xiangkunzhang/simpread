@@ -18,3 +18,5 @@ ext/_locales/**
 
 # for mac
 **/.DS_Store
+
+.idea
